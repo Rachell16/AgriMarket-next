@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useCartStore } from '@/store/cartStore'
 import { rupiah } from '@/lib/utils'
 import toast from 'react-hot-toast'
+import { useState } from 'react'
 
 interface Produk {
   id: number; nama: string; harga: number; satuan: string
@@ -12,64 +13,64 @@ interface Produk {
 }
 
 export default function ProdukCard({ p }: { p: Produk }) {
-  const { addItem, removeItem, updateQty, items } = useCartStore()
+  const { addItem, updateQty, removeItem, items } = useCartStore()
+  const [imgError, setImgError] = useState(false)
   const icon = p.icon || '🌿'
   const cartItem = items.find(i => i.id === p.id)
   const inCart = !!cartItem
 
   const handleAdd = () => {
     addItem({ id: p.id, nama: p.nama, harga: p.harga, satuan: p.satuan, icon, petani_id: p.petani_id, stok: p.stok })
-    toast.success(`${p.nama} ditambahkan ke keranjang!`)
+    toast.success(`${p.nama} ditambahkan!`, { duration: 1500 })
   }
 
   return (
-    <div className="card overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+    <div className="card overflow-hidden hover:shadow-md transition-all duration-200 active:scale-95">
       <Link href={`/produk/${p.id}`}>
-        <div className="h-40 bg-green-50 flex items-center justify-center relative overflow-hidden">
-          {p.foto_url ? (
-            <img src={p.foto_url} alt={p.nama} className="w-full h-full object-cover" />
+        <div className="h-36 sm:h-40 bg-green-50 flex items-center justify-center relative overflow-hidden">
+          {p.foto_url && !imgError ? (
+            <img src={p.foto_url} alt={p.nama} className="w-full h-full object-cover"
+              onError={() => setImgError(true)} />
           ) : (
-            <span className="text-5xl">{icon}</span>
+            <span className="text-4xl sm:text-5xl">{icon}</span>
           )}
           {p.is_organik && (
-            <span className="absolute top-2 left-2 badge-green text-[10px]">🌿 Organik</span>
+            <span className="absolute top-1.5 left-1.5 bg-green-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">🌿 Organik</span>
           )}
           {inCart && (
-            <span className="absolute top-2 right-2 bg-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-              {cartItem.jumlah} di keranjang
+            <span className="absolute top-1.5 right-1.5 bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+              {cartItem.jumlah} 🛒
             </span>
           )}
         </div>
       </Link>
-      <div className="p-4">
+      <div className="p-3">
         <Link href={`/produk/${p.id}`}>
-          <div className="font-semibold text-gray-900 text-sm mb-1 leading-snug hover:text-green-700 transition-colors">{p.nama}</div>
+          <div className="font-semibold text-gray-900 text-xs mb-0.5 leading-snug hover:text-green-700 line-clamp-2">{p.nama}</div>
         </Link>
-        <div className="text-xs text-gray-500 mb-1">{p.nama_toko || p.nama_petani || '—'}</div>
-        <div className="text-xs text-amber-500 mb-3">
-          {'★'.repeat(Math.floor(p.rating))}{'☆'.repeat(5 - Math.ceil(p.rating))} {p.rating.toFixed(1)}
-          <span className="text-gray-400 ml-1">({p.total_terjual} terjual)</span>
+        <div className="text-[10px] text-gray-400 mb-1 truncate">{p.nama_toko || p.nama_petani || '—'}</div>
+        <div className="text-[10px] text-amber-500 mb-2">
+          {'★'.repeat(Math.floor(p.rating))}{'☆'.repeat(5-Math.ceil(p.rating))} {p.rating.toFixed(1)}
+          <span className="text-gray-300 ml-1">({p.total_terjual})</span>
         </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="font-bold text-green-700 text-base">{rupiah(p.harga)}</span>
-            <span className="text-gray-400 text-xs">/{p.satuan}</span>
+        <div className="flex items-center justify-between gap-1">
+          <div className="min-w-0">
+            <span className="font-bold text-green-700 text-sm">{rupiah(p.harga)}</span>
+            <span className="text-gray-400 text-[10px]">/{p.satuan}</span>
           </div>
           {inCart ? (
-            <div className="flex items-center gap-1">
-              <button onClick={() => cartItem.jumlah <= 1 ? removeItem(p.id) : updateQty(p.id, cartItem.jumlah - 1)}
-                className="w-7 h-7 rounded-lg bg-green-100 text-green-700 font-bold text-sm flex items-center justify-center hover:bg-green-200 transition-colors">
+            <div className="flex items-center gap-1 shrink-0">
+              <button onClick={() => cartItem.jumlah <= 1 ? removeItem(p.id) : updateQty(p.id, cartItem.jumlah-1)}
+                className="w-6 h-6 rounded-lg bg-green-100 text-green-700 font-bold text-xs flex items-center justify-center">
                 {cartItem.jumlah <= 1 ? '🗑' : '−'}
               </button>
-              <span className="w-6 text-center text-sm font-bold text-green-700">{cartItem.jumlah}</span>
-              <button onClick={() => updateQty(p.id, cartItem.jumlah + 1)}
-                className="w-7 h-7 rounded-lg bg-green-600 text-white font-bold text-sm flex items-center justify-center hover:bg-green-700 transition-colors">
-                +
-              </button>
+              <span className="w-5 text-center text-xs font-bold text-green-700">{cartItem.jumlah}</span>
+              <button onClick={() => updateQty(p.id, cartItem.jumlah+1)}
+                className="w-6 h-6 rounded-lg bg-green-600 text-white font-bold text-xs flex items-center justify-center">+</button>
             </div>
           ) : (
             <button onClick={handleAdd}
-              className="bg-green-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-green-700 transition-colors">
+              className="bg-green-600 text-white text-[10px] font-semibold px-2.5 py-1.5 rounded-lg hover:bg-green-700 shrink-0 active:bg-green-800">
               + Keranjang
             </button>
           )}
