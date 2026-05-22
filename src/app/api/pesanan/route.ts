@@ -10,7 +10,7 @@ export async function GET() {
 
     const { data, error } = await supabaseAdmin
       .from('pesanan')
-      .select('*, detail_pesanan(id, nama_produk, jumlah, harga, subtotal)')
+      .select('*, detail_pesanan(id, produk_id, nama_produk, jumlah, harga, subtotal)')
       .eq('konsumen_id', user.id)
       .order('created_at', { ascending: false })
 
