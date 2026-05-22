@@ -39,10 +39,27 @@ export async function POST(req: NextRequest) {
       .from('ulasan').select('rating').eq('produk_id', produk_id)
     if (allUlasan && allUlasan.length > 0) {
       const avgRating = allUlasan.reduce((s: number, u: any) => s + u.rating, 0) / allUlasan.length
+      const roundedRating = Math.round(avgRating * 10) / 10
       await supabaseAdmin.from('produk').update({
-        rating: Math.round(avgRating * 10) / 10,
-        total_ulasan: allUlasan.length
+        rating: roundedRating,
       }).eq('id', produk_id)
+    }
+
+    // Update rating petani (rata-rata semua produk petani)
+    const { data: produkData } = await supabaseAdmin
+      .from('produk').select('petani_id').eq('id', produk_id).single()
+    if (produkData?.petani_id) {
+      const { data: semuaUlasanPetani } = await supabaseAdmin
+        .from('ulasan')
+        .select('rating, produk!inner(petani_id)')
+        .eq('produk.petani_id', produkData.petani_id)
+      if (semuaUlasanPetani && semuaUlasanPetani.length > 0) {
+        const avgPetani = semuaUlasanPetani.reduce((s: number, u: any) => s + u.rating, 0) / semuaUlasanPetani.length
+        await supabaseAdmin.from('petani_profil').update({
+          rating: Math.round(avgPetani * 10) / 10,
+          total_ulasan: semuaUlasanPetani.length
+        }).eq('user_id', produkData.petani_id)
+      }
     }
 
     return NextResponse.json({ ok: true })

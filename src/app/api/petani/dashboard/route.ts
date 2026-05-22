@@ -30,18 +30,19 @@ export async function GET() {
       pesanan = p || []
     }
 
-    // Hitung pendapatan hari ini
+    // Hitung pendapatan dari pesanan selesai
+    const pesananSelesai = pesanan?.filter((p: any) => p.status === 'selesai') || []
+    const pendapatan = pesananSelesai.reduce((s: number, p: any) => s + p.total_bayar, 0)
+
+    // Hitung pesanan hari ini
     const today = new Date().toISOString().slice(0, 10)
-    const pesananHari = pesanan.filter(p =>
-      p.created_at.startsWith(today) && p.status !== 'dibatalkan'
-    )
-    const pendapatan = pesananHari.reduce((s: number, p: any) => s + p.total_bayar, 0)
+    const pesananHari = pesanan?.filter((p: any) => p.created_at?.startsWith(today)) || []
 
     return NextResponse.json({
       nama: user.nama,
       profil,
       stats: { produkAktif: produkAktif || 0, pesananHari: pesananHari.length, pendapatan },
-      pesanan,
+      pesanan: pesanan || [],
     })
   } catch (e: any) {
     console.error('petani dashboard:', e)
