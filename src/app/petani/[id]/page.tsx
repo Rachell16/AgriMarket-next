@@ -4,6 +4,8 @@ import Footer from '@/components/Footer'
 import ProdukCard from '@/components/ProdukCard'
 import { notFound } from 'next/navigation'
 
+export const revalidate = 0
+
 export default async function ProfilPetaniPage({ params }: { params: { id: string } }) {
   const { data: profil } = await supabaseAdmin
     .from('petani_profil')

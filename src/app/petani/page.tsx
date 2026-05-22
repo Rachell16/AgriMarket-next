@@ -3,6 +3,8 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 
+export const revalidate = 0
+
 export default async function PetaniPage() {
   const { data: petanis } = await supabaseAdmin
     .from('petani_profil').select('*, users(nama)')

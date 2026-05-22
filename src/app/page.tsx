@@ -12,6 +12,8 @@ function hitungScore(produk: any, maxTerjual: number): number {
   return ratingScore + terjualScore + stokScore + organikBonus
 }
 
+export const revalidate = 0
+
 async function getData() {
   const [{ data: produkRaw }, { data: kategoris }] = await Promise.all([
     supabaseAdmin.from('produk').select('*, kategori(nama,icon,slug)').eq('is_aktif', true).gt('stok', 0).limit(50),

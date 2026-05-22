@@ -12,6 +12,8 @@ async function getData() {
   return { petanis: petanis || [] }
 }
 
+export const revalidate = 0
+
 export default async function TentangPage() {
   const { petanis } = await getData()
 
