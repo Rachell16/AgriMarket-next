@@ -34,31 +34,38 @@ export async function POST(req: NextRequest) {
       .from('ulasan').insert({ produk_id, user_id: user.id, pesanan_id, rating, komentar })
     if (errInsert) throw errInsert
 
-    // Update rating produk (rata-rata)
+    // Update rating produk
     const { data: allUlasan } = await supabaseAdmin
       .from('ulasan').select('rating').eq('produk_id', produk_id)
     if (allUlasan && allUlasan.length > 0) {
       const avgRating = allUlasan.reduce((s: number, u: any) => s + u.rating, 0) / allUlasan.length
-      const roundedRating = Math.round(avgRating * 10) / 10
       await supabaseAdmin.from('produk').update({
-        rating: roundedRating,
+        rating: Math.round(avgRating * 10) / 10,
       }).eq('id', produk_id)
     }
 
-    // Update rating petani (rata-rata semua produk petani)
-    const { data: produkData } = await supabaseAdmin
+    // Update rating petani — query terpisah tanpa join
+    const { data: produkInfo } = await supabaseAdmin
       .from('produk').select('petani_id').eq('id', produk_id).single()
-    if (produkData?.petani_id) {
-      const { data: semuaUlasanPetani } = await supabaseAdmin
-        .from('ulasan')
-        .select('rating, produk!inner(petani_id)')
-        .eq('produk.petani_id', produkData.petani_id)
-      if (semuaUlasanPetani && semuaUlasanPetani.length > 0) {
-        const avgPetani = semuaUlasanPetani.reduce((s: number, u: any) => s + u.rating, 0) / semuaUlasanPetani.length
-        await supabaseAdmin.from('petani_profil').update({
-          rating: Math.round(avgPetani * 10) / 10,
-          total_ulasan: semuaUlasanPetani.length
-        }).eq('user_id', produkData.petani_id)
+
+    if (produkInfo?.petani_id) {
+      // Ambil semua produk milik petani ini
+      const { data: produkPetani } = await supabaseAdmin
+        .from('produk').select('id').eq('petani_id', produkInfo.petani_id)
+
+      if (produkPetani && produkPetani.length > 0) {
+        const produkIds = produkPetani.map((p: any) => p.id)
+        // Ambil semua ulasan untuk produk-produk tersebut
+        const { data: ulasanPetani } = await supabaseAdmin
+          .from('ulasan').select('rating').in('produk_id', produkIds)
+
+        if (ulasanPetani && ulasanPetani.length > 0) {
+          const avgPetani = ulasanPetani.reduce((s: number, u: any) => s + u.rating, 0) / ulasanPetani.length
+          await supabaseAdmin.from('petani_profil').update({
+            rating: Math.round(avgPetani * 10) / 10,
+            total_ulasan: ulasanPetani.length
+          }).eq('user_id', produkInfo.petani_id)
+        }
       }
     }
 
