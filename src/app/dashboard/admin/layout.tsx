@@ -24,8 +24,9 @@ export default function DashboardAdminLayout({ children }: { children: React.Rea
   }
 
   const navItems = [
-    { href: '/dashboard/admin',          icon: '📊', label: 'Dashboard' },
-    { href: '/dashboard/admin/settings', icon: '⚙️', label: 'Pengaturan Bayar' },
+    { href: '/dashboard/admin',           icon: '📊', label: 'Dashboard' },
+    { href: '/dashboard/admin/analisis',  icon: '📈', label: 'Analisis Data' },
+    { href: '/dashboard/admin/settings',  icon: '⚙️', label: 'Pengaturan Bayar' },
   ]
 
   return (
