@@ -2,9 +2,11 @@
 import { useEffect, useState } from 'react'
 import { rupiah } from '@/lib/utils'
 import toast from 'react-hot-toast'
+import { BadgePrioritas } from '@/components/BadgePrioritas'
 
 export default function DashboardPetaniProdukPage() {
   const [produk, setProduk] = useState<any[]>([])
+  const [prioritasMap, setPrioritasMap] = useState<Record<number, { prioritas: 'Tinggi'|'Sedang'|'Rendah'; alasan: string[] }>>({})
   const [kategoris, setKategoris] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -17,7 +19,15 @@ export default function DashboardPetaniProdukPage() {
     Promise.all([
       fetch('/api/petani/produk').then(r => r.json()),
       fetch('/api/kategori').then(r => r.json()),
-    ]).then(([p, k]) => { setProduk(p.produk||[]); setKategoris(k.kategoris||[]); setLoading(false) })
+      fetch('/api/prioritas').then(r => r.json()),
+    ]).then(([p, k, pr]) => {
+      setProduk(p.produk||[])
+      setKategoris(k.kategoris||[])
+      const map: Record<number, any> = {}
+      ;(pr.data||[]).forEach((x:any) => { map[x.id] = { prioritas: x.prioritas, alasan: x.alasan } })
+      setPrioritasMap(map)
+      setLoading(false)
+    })
   }
   useEffect(load, [])
 
@@ -186,6 +196,12 @@ export default function DashboardPetaniProdukPage() {
                   {p.is_organik && <span className="badge-green text-[10px]">🌿 Organik</span>}
                   <span className={`text-xs ${p.stok<=5?'text-red-500 font-semibold':'text-gray-500'}`}>Stok: {p.stok}</span>
                   <span className="text-xs text-gray-400">{p.total_terjual} terjual</span>
+                  {prioritasMap[p.id] && (
+                    <BadgePrioritas
+                      prioritas={prioritasMap[p.id].prioritas}
+                      alasan={prioritasMap[p.id].alasan}
+                    />
+                  )}
                 </div>
                 <div className="flex gap-2 mt-2">
                   <button onClick={() => openEdit(p)} className="flex-1 btn-outline btn-sm text-xs justify-center">✏️ Edit</button>
