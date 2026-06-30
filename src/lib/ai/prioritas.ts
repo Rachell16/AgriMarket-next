@@ -7,6 +7,14 @@ export type ProdukFitur = {
 export type HasilPrioritas = {
   prioritas: "Tinggi" | "Sedang" | "Rendah";
   alasan: string[];
+  kesimpulan: string;   // penjelasan ramah-petani
+};
+
+
+const KESIMPULAN: Record<string, string> = {
+  Tinggi: "Produk ini laris dan stoknya menipis. Sebaiknya segera ditambah stok dan dipromosikan.",
+  Sedang: "Produk ini cukup laku dan stoknya masih aman. Pantau saja secara berkala.",
+  Rendah: "Produk ini sepi peminat. Belum mendesak; bisa dievaluasi harga atau promosinya.",
 };
 
 export function klasifikasiPrioritas(p: ProdukFitur): HasilPrioritas {
@@ -17,15 +25,15 @@ export function klasifikasiPrioritas(p: ProdukFitur): HasilPrioritas {
       alasan.push("rating ≤ 4.25");
       if (p.rasio_harga <= 0.83) {
         alasan.push("rasio harga terhadap median kategori ≤ 0.83");
-        return { prioritas: "Rendah", alasan };
+        return { prioritas: "Rendah", alasan, kesimpulan: KESIMPULAN["Rendah"] };
       } else {
         alasan.push("rasio harga terhadap median kategori > 0.83");
         if (p.terjual_30hr <= 5.5) {
           alasan.push("penjualan 30 hari ≤ 5.5");
-          return { prioritas: "Rendah", alasan };
+          return { prioritas: "Rendah", alasan, kesimpulan: KESIMPULAN["Rendah"] };
         } else {
           alasan.push("penjualan 30 hari > 5.5");
-          return { prioritas: "Rendah", alasan };
+          return { prioritas: "Rendah", alasan, kesimpulan: KESIMPULAN["Rendah"] };
         }
       }
     } else {
@@ -34,19 +42,19 @@ export function klasifikasiPrioritas(p: ProdukFitur): HasilPrioritas {
         alasan.push("stok ≤ 15.5");
         if (p.terjual_30hr <= 5.5) {
           alasan.push("penjualan 30 hari ≤ 5.5");
-          return { prioritas: "Tinggi", alasan };
+          return { prioritas: "Tinggi", alasan, kesimpulan: KESIMPULAN["Tinggi"] };
         } else {
           alasan.push("penjualan 30 hari > 5.5");
-          return { prioritas: "Tinggi", alasan };
+          return { prioritas: "Tinggi", alasan, kesimpulan: KESIMPULAN["Tinggi"] };
         }
       } else {
         alasan.push("stok > 15.5");
         if (p.stok <= 24.5) {
           alasan.push("stok ≤ 24.5");
-          return { prioritas: "Rendah", alasan };
+          return { prioritas: "Rendah", alasan, kesimpulan: KESIMPULAN["Rendah"] };
         } else {
           alasan.push("stok > 24.5");
-          return { prioritas: "Sedang", alasan };
+          return { prioritas: "Sedang", alasan, kesimpulan: KESIMPULAN["Sedang"] };
         }
       }
     }
@@ -58,19 +66,19 @@ export function klasifikasiPrioritas(p: ProdukFitur): HasilPrioritas {
         alasan.push("rating ≤ 4.25");
         if (p.terjual_30hr <= 17.5) {
           alasan.push("penjualan 30 hari ≤ 17.5");
-          return { prioritas: "Sedang", alasan };
+          return { prioritas: "Sedang", alasan, kesimpulan: KESIMPULAN["Sedang"] };
         } else {
           alasan.push("penjualan 30 hari > 17.5");
-          return { prioritas: "Tinggi", alasan };
+          return { prioritas: "Tinggi", alasan, kesimpulan: KESIMPULAN["Tinggi"] };
         }
       } else {
         alasan.push("rating > 4.25");
         if (p.rasio_harga <= 0.48) {
           alasan.push("rasio harga terhadap median kategori ≤ 0.48");
-          return { prioritas: "Tinggi", alasan };
+          return { prioritas: "Tinggi", alasan, kesimpulan: KESIMPULAN["Tinggi"] };
         } else {
           alasan.push("rasio harga terhadap median kategori > 0.48");
-          return { prioritas: "Tinggi", alasan };
+          return { prioritas: "Tinggi", alasan, kesimpulan: KESIMPULAN["Tinggi"] };
         }
       }
     } else {
@@ -79,19 +87,19 @@ export function klasifikasiPrioritas(p: ProdukFitur): HasilPrioritas {
         alasan.push("stok ≤ 17.5");
         if (p.terjual_30hr <= 27.5) {
           alasan.push("penjualan 30 hari ≤ 27.5");
-          return { prioritas: "Sedang", alasan };
+          return { prioritas: "Sedang", alasan, kesimpulan: KESIMPULAN["Sedang"] };
         } else {
           alasan.push("penjualan 30 hari > 27.5");
-          return { prioritas: "Sedang", alasan };
+          return { prioritas: "Sedang", alasan, kesimpulan: KESIMPULAN["Sedang"] };
         }
       } else {
         alasan.push("stok > 17.5");
         if (p.rating <= 4.85) {
           alasan.push("rating ≤ 4.85");
-          return { prioritas: "Sedang", alasan };
+          return { prioritas: "Sedang", alasan, kesimpulan: KESIMPULAN["Sedang"] };
         } else {
           alasan.push("rating > 4.85");
-          return { prioritas: "Sedang", alasan };
+          return { prioritas: "Sedang", alasan, kesimpulan: KESIMPULAN["Sedang"] };
         }
       }
     }

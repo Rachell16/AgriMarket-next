@@ -54,8 +54,8 @@ export async function GET() {
         is_organik: p.is_organik ? 1 : 0,
         rasio_harga: +(p.harga / (medianKat[p.kategori_id] || p.harga)).toFixed(2),
       }
-      const { prioritas, alasan } = klasifikasiPrioritas(fitur)
-      return { id: p.id, nama: p.nama, prioritas, alasan, fitur }
+      const { prioritas, alasan, kesimpulan } = klasifikasiPrioritas(fitur)
+      return { id: p.id, nama: p.nama, prioritas, alasan, kesimpulan, fitur }
     })
 
     const urutan: Record<string, number> = { Tinggi: 0, Sedang: 1, Rendah: 2 }

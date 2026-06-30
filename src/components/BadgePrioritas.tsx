@@ -10,9 +10,11 @@ const STYLE: Record<string, string> = {
 export function BadgePrioritas({
   prioritas,
   alasan,
+  kesimpulan,
 }: {
   prioritas: 'Tinggi' | 'Sedang' | 'Rendah'
   alasan: string[]
+  kesimpulan?: string
 }) {
   const [buka, setBuka] = useState(false)
   return (
@@ -25,13 +27,19 @@ export function BadgePrioritas({
         Prioritas {prioritas} ⓘ
       </button>
       {buka && (
-        <div className="absolute z-10 mt-1 w-64 bg-white border rounded-lg shadow-lg p-3 text-xs text-gray-700">
+        <div className="absolute z-10 mt-1 w-72 bg-white border rounded-lg shadow-lg p-3 text-xs text-gray-700">
           <p className="font-semibold mb-1">Alasan keputusan AI (Decision Tree):</p>
           <ul className="list-disc list-inside space-y-0.5">
             {alasan.map((a, i) => (
               <li key={i}>{a}</li>
             ))}
           </ul>
+          {kesimpulan && (
+            <p className="mt-2 pt-2 border-t text-gray-800">
+              <span className="font-semibold">Kesimpulan: </span>
+              {kesimpulan}
+            </p>
+          )}
         </div>
       )}
     </div>

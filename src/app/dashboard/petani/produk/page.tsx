@@ -6,7 +6,7 @@ import { BadgePrioritas } from '@/components/BadgePrioritas'
 
 export default function DashboardPetaniProdukPage() {
   const [produk, setProduk] = useState<any[]>([])
-  const [prioritasMap, setPrioritasMap] = useState<Record<number, { prioritas: 'Tinggi'|'Sedang'|'Rendah'; alasan: string[] }>>({})
+  const [prioritasMap, setPrioritasMap] = useState<Record<number, { prioritas: 'Tinggi'|'Sedang'|'Rendah'; alasan: string[]; kesimpulan?: string }>>({})
   const [kategoris, setKategoris] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -24,7 +24,7 @@ export default function DashboardPetaniProdukPage() {
       setProduk(p.produk||[])
       setKategoris(k.kategoris||[])
       const map: Record<number, any> = {}
-      ;(pr.data||[]).forEach((x:any) => { map[x.id] = { prioritas: x.prioritas, alasan: x.alasan } })
+      ;(pr.data||[]).forEach((x:any) => { map[x.id] = { prioritas: x.prioritas, alasan: x.alasan, kesimpulan: x.kesimpulan } })
       setPrioritasMap(map)
       setLoading(false)
     })
@@ -200,6 +200,7 @@ export default function DashboardPetaniProdukPage() {
                     <BadgePrioritas
                       prioritas={prioritasMap[p.id].prioritas}
                       alasan={prioritasMap[p.id].alasan}
+                      kesimpulan={prioritasMap[p.id].kesimpulan}
                     />
                   )}
                 </div>
